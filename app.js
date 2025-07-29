@@ -1,5 +1,5 @@
 import { AlienSpaceship } from './enemies.js';
-
+import { AudioManager } from './audio.js';
 
 // THREE.JS ENVIRONMENT SETUP
 
@@ -31,7 +31,17 @@ directionalLight.position.set(0, 4, 4);
 scene.add(directionalLight);
 
 
+// SOUND
 
+const audioManager = new AudioManager();
+export default audioManager;
+audioManager.loadSound('laser1', './Audio/laser1.mp3');
+audioManager.loadSound('laser2', './Audio/laser2.mp3');
+audioManager.loadSound('laser3', './Audio/laser3.mp3');
+audioManager.loadSound('laser4', './Audio/laser4.mp3');
+audioManager.loadSound('asteroidExplosion1', './Audio/asteroidExplosion.mp3');
+audioManager.loadSound('enemyDeath1', './Audio/enemyDeath1.mp3');
+audioManager.loadSound('playerHit', './Audio/playerHit.mp3');
 
 
 // SPACESHIP 
@@ -111,7 +121,7 @@ function createAsteroid() {
 
 function spawnAsteroid() {
 
-    if (asteroids.length < difficulty * 4) {
+    if (asteroids.length < difficulty * 6) {
         createAsteroid();
     } 
 }
@@ -172,7 +182,6 @@ function updateFragments(fragments) {
 }
 
 
-
 // Laser setup
 const lasers = [];
 const laserMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
@@ -184,6 +193,7 @@ function shootLaser() {
     laser.rotation.x = Math.PI / 2;
     lasers.push(laser);
     scene.add(laser);
+    audioManager.playSound('laser2');
 }
 
 function checkLaserCollisions() {
@@ -200,6 +210,7 @@ function checkLaserCollisions() {
                 asteroids.splice(asteroids.indexOf(asteroid), 1);
                 scene.remove(laser);
                 lasers.splice(lasers.indexOf(laser), 1);
+                audioManager.playSound('asteroidExplosion1');
             }
         });
 
@@ -208,11 +219,11 @@ function checkLaserCollisions() {
                 console.log("Alien spaceship hit!");
                 score++;
                 
-                if (difficulty < 6) {
+                if (difficulty < 7) {
                     difficulty++;
                 }
                 scene.remove(alien.beam);
-
+                audioManager.playSound('enemyDeath1');
                 alien.remove();
                 aliens.splice(aliens.indexOf(alien), 1);
                 scene.remove(laser);
@@ -368,6 +379,7 @@ function updateAlienLasers() {
             if (laser.position.distanceTo(spaceship.position) < 1) {
                 console.log('Player hit!!!');
                 playerHealth -= 10;
+                audioManager.playSound('playerHit');
             }
 
 
@@ -443,8 +455,10 @@ function animate() {
         // Collision detection
         if (spaceship.position.distanceTo(asteroid.position) < 1.0) {
             console.log("Collision Detected!");
+            audioManager.playSound('asteroidExplosion1');
 
             playerHealth -= 10;
+            audioManager.playSound('playerHit');
             
             // Reset asteroid position after collision
             asteroid.position.z = 5;

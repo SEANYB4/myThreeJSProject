@@ -1,3 +1,5 @@
+import audioManager from "./app.js";
+
 export class AlienSpaceship {
 
 
@@ -26,6 +28,7 @@ export class AlienSpaceship {
 
         this.scene.add(this.beam);
         this.beamActive = true;
+        audioManager.playSound('laser4');
 
         setTimeout(() => {
             this.deactivateBeam();
@@ -122,6 +125,7 @@ export class AlienSpaceship {
         laser.rotation.x = Math.PI / 2;
         this.lasers.push(laser);
         this.scene.add(laser);
-
+        audioManager.playSound('laser2');
+        
     }
 }
