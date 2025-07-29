@@ -1,9 +1,14 @@
+import { AlienSpaceship } from './enemies.js';
+
+
+// THREE.JS ENVIRONMENT SETUP
+
+
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
-
 
 const loader = new THREE.CubeTextureLoader();
 const texture = loader.load([
@@ -17,12 +22,20 @@ const texture = loader.load([
 
 scene.background = texture;
 
-// Lighting
+
+
+
+// LIGHTING
 const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
 directionalLight.position.set(0, 4, 4);
 scene.add(directionalLight);
 
-// Spaceship components
+
+
+
+
+// SPACESHIP 
+
 const spaceship = new THREE.Group();
 
 // Main body
@@ -63,22 +76,18 @@ scene.add(spaceship);
 
 
 
+// GAME VARIABLES
+
+let playerHealth = 100;
+let score = 0;
+let difficulty = 1;
+
 
 // Asteroids setup
 const asteroids = [];
+const smallerAsteroids = [];
 const asteroidMaterial = new THREE.MeshPhongMaterial({ color: 0x808080 });
-const asteroidVelocity = 0.1;
-
-// function createAsteroid() {
-//     const size = Math.random() * 0.5 + 0.1;
-//     const asteroidGeometry = new THREE.DodecahedronGeometry(size);
-//     const asteroid = new THREE.Mesh(asteroidGeometry, asteroidMaterial);
-//     asteroid.position.set((Math.random() - 10) * 100, (Math.random() - 100) * 10, 5);
-//     asteroid.position.z = 30;
-//     asteroids.push(asteroid);
-//     scene.add(asteroid);
-// }
-
+const asteroidVelocity = 0.2;
 
 
 function createAsteroid() {
@@ -99,10 +108,70 @@ function createAsteroid() {
     
 }
 
-// Generate several asteroids
-for (let i = 0; i < 20; i++) {
-    createAsteroid();
+
+function spawnAsteroid() {
+
+    if (asteroids.length < difficulty * 4) {
+        createAsteroid();
+    } 
 }
+
+
+
+function createSmallerAsteroids(asteroid) {
+
+
+    const numFragments = 3 + Math.floor(Math.random() * 5);
+    const fragments = [];
+
+
+
+
+    for (let i = 0; i < numFragments; i++) {
+
+
+        const size = asteroid.geometry.parameters.radius * 0.3;
+        const fragmentGeometry = new THREE.DodecahedronGeometry(size);
+        const fragment = new THREE.Mesh(fragmentGeometry, asteroid.material);
+
+
+        // Start fragments at the position of the original asteroid
+        fragment.position.copy(asteroid.position);
+
+
+        // Give fragments a random velocity
+        const speed = 0.5 * Math.random() * 0.5;
+        fragment.velocity = new THREE.Vector3(
+            (Math.random() - 0.5) * speed,
+            (Math.random() - 0.5) * speed,
+            (Math.random() - 0.5) * speed
+        );
+
+        fragments.push(fragment);
+        scene.add(fragment);
+    }
+
+    return fragments;
+}
+
+
+
+function updateFragments(fragments) {
+  
+    fragments.forEach((fragment, index) => {
+       
+
+        fragment.position.add(fragment.velocity);
+        // Example condition: remove if it moves too far from origin
+        if (fragment.position.length() > 50) {
+            scene.remove(fragment);
+            fragments.splice(index, 1);
+        }
+
+    })
+}
+
+
 
 // Laser setup
 const lasers = [];
@@ -117,9 +186,83 @@ function shootLaser() {
     scene.add(laser);
 }
 
+function checkLaserCollisions() {
+
+    lasers.forEach(laser => {
+        asteroids.forEach(asteroid => {
+            if (laser.position.distanceTo(asteroid.position) < 1) {
+                console.log('Asteroid destroyed!');
+                const fragments = createSmallerAsteroids(asteroid);
+                fragments.forEach(fragment => {
+                    smallerAsteroids.push(fragment);
+                });
+                scene.remove(asteroid);
+                asteroids.splice(asteroids.indexOf(asteroid), 1);
+                scene.remove(laser);
+                lasers.splice(lasers.indexOf(laser), 1);
+            }
+        });
+
+        aliens.forEach(alien => {
+            if (laser.position.distanceTo(alien.mesh.position) < 1) {
+                console.log("Alien spaceship hit!");
+                score++;
+                
+                if (difficulty < 6) {
+                    difficulty++;
+                }
+                scene.remove(alien.beam);
+
+                alien.remove();
+                aliens.splice(aliens.indexOf(alien), 1);
+                scene.remove(laser);
+                lasers.splice(lasers.indexOf(laser), 1);
+            }
+        });
+    });
 
 
 
+}
+
+
+function checkBeamCollisions() {
+
+
+    // aliens.forEach((alien) => {
+
+
+    //     if (alien.beamActive && alien.beam) {
+           
+
+    //         // Check collision with player
+    //         if (alien.beam.position.distanceTo(spaceship.position) < 1) {
+    //             playerHealth -= 20;
+    //         }
+
+    //         // Check collision with asteroids
+
+
+    //         asteroids.forEach((asteroid, index) => {
+    //             if (alien.beam.position.distanceTo(asteroid.position) < 1) {
+    //                 const fragments = createSmallerAsteroids(asteroid);
+    //                 fragments.forEach(fragment => {
+    //                     smallerAsteroids.push(fragment);
+    //                 });
+    //                 scene.remove(asteroid);
+    //                 asteroids.splice(asteroids.indexOf(asteroid), 1);
+    //             }
+    //         });
+
+    //     }
+
+    // });
+}
+
+
+
+
+// crosshair setup
 
 function createCrosshair() {
 
@@ -161,8 +304,13 @@ spaceship.add(crosshair);
 
 
 
+
+
+
+// camera setup
+
 // Set initial camera position
-camera.position.z = 10;
+camera.position.z = 20;
 
 // Movement controls
 const speed = 0.3;
@@ -187,9 +335,83 @@ document.addEventListener('keydown', function(event) {
     }
 });
 
+
+
+// enemies setup
+
+
+const aliens = [];
+function spawnAliens() {
+
+    if (aliens.length < difficulty) {
+        const alien = new AlienSpaceship(scene);
+        aliens.push(alien);
+    } 
+}
+
+let globalLasers = [];
+
+
+function updateAlienLasers() {
+
+ 
+
+
+        globalLasers.forEach((laser, index) => {
+
+            laser.position.z += 0.5;
+            if (laser.position.z > 50) {
+                scene.remove(laser);
+                globalLasers.splice(index, 1);
+            }
+
+            if (laser.position.distanceTo(spaceship.position) < 1) {
+                console.log('Player hit!!!');
+                playerHealth -= 10;
+            }
+
+
+        });
+    
+}
+
+
+
+
+
+// Set random interval for spawning aliens
+setInterval(spawnAliens, Math.random() * 5000 + 2000);
+
+
+
+function gameOver() {
+
+    document.getElementById('gameOverMessage').style.display = 'block';
+    cancelAnimationFrame(animationId);
+
+}
+
+
+
+
+
+// animation setup
+
+let animationId = null;
+
+
 // Animation loop
 function animate() {
-    requestAnimationFrame(animate);
+
+
+
+    animationId = requestAnimationFrame(animate);
+
+
+    // update score
+
+    document.getElementById('score').innerHTML = `Score: ${score}`;
+    document.getElementById('health').innerHTML = `Player Health: ${playerHealth}`;
 
 
     spaceship.rotation.z += 0.01;
@@ -204,41 +426,61 @@ function animate() {
     });
 
 
+
+    spawnAsteroid();
+
     // Move asteroids
     asteroids.forEach(asteroid => {
         asteroid.position.z += asteroidVelocity;
-        if (asteroid.position.z > 5) {
+        asteroid.rotation.z += 0.01;
+        
+        if (asteroid.position.z > 10) {
             asteroid.position.z = -20;
             asteroid.position.x = (Math.random() - 0.5) * 10;
             asteroid.position.y = (Math.random() - 0.5) * 10;
         }
 
         // Collision detection
-        if (spaceship.position.distanceTo(asteroid.position) < 0.75) {
+        if (spaceship.position.distanceTo(asteroid.position) < 1.0) {
             console.log("Collision Detected!");
+
+            playerHealth -= 10;
+            
             // Reset asteroid position after collision
             asteroid.position.z = 5;
             asteroid.position.x = (Math.random() - 0.5) * 10;
             asteroid.position.y = (Math.random() - 0.5) * 10;
+
+           
         }
-
-         // Check for laser hits
-        lasers.forEach(laser => {
-            if (laser.position.distanceTo(asteroid.position) < 1) {
-                console.log("Asteroid destroyed!");
-                scene.remove(asteroid);
-                asteroids.splice(index, 1);
-                resetAsteroid(asteroid);
-                scene.remove(laser);
-                lasers.splice(lasers.indexOf(laser), 1);
-            }
-        });
-
     });
 
+    updateFragments(smallerAsteroids);
 
+
+    // update enemies
+
+    aliens.forEach(alien => {
+        
+        alien.update()
+        alien.lasers.forEach(laser => {
+            globalLasers.push(laser);
+        });
+        alien.lasers = [];
+    
+    });
+
+    updateAlienLasers();
+
+    checkLaserCollisions();
+    checkBeamCollisions();
+
+    if (playerHealth <= 0) {
+        gameOver();
+    }
    
     renderer.render(scene, camera);
 }
 
 animate();
+
