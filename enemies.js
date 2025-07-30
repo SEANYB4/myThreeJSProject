@@ -1,4 +1,5 @@
 import audioManager from "./app.js";
+import { spaceship } from "./app.js";
 
 export class AlienSpaceship {
 
@@ -10,9 +11,11 @@ export class AlienSpaceship {
         this.velocity = new THREE.Vector3(0.1, 0.1, 0.1);
         this.scene.add(this.mesh);
         this.lasers = [];
+        this.energyBalls = [];
         this.beam = null;
         this.beamActive = false;
-        this.beamDuration = 2000;
+        this.beamDuration = 1000;
+        this.health = 100;
     }
 
     activateBeam() {
@@ -70,7 +73,7 @@ export class AlienSpaceship {
     }
 
     maybeActivateBeam() {
-        if (!this.beamActive && Math.random() < 0.01) {
+        if (!this.beamActive && Math.random() < 0.001) {
             this.activateBeam();
         }
     }
@@ -85,10 +88,29 @@ export class AlienSpaceship {
 
         this.maybeActivateBeam();
 
+        if (Math.random() < 0.001) {
+            this.shootEnergyBall();
+        }
+
         if (this.beam) {
             this.beam.position.copy(this.mesh.position);
             this.beam.position.z += 25;
         }
+
+
+        this.energyBalls.forEach((energyBall, index) => {
+            const sourcePosition = energyBall.position;
+            const targetPosition = spaceship.position;
+
+            const moveVector = new THREE.Vector3(0, 0, 0.5);
+
+            energyBall.position.add(moveVector);
+            energyBall.rotation.z += 0.1;
+
+        });
+
+
+
     }
 
 
@@ -127,5 +149,22 @@ export class AlienSpaceship {
         this.scene.add(laser);
         audioManager.playSound('laser2');
         
+    }
+
+
+
+    shootEnergyBall() {
+
+
+        const energyBallGeometry = new THREE.SphereGeometry(1, 32, 32);
+        const energryBallMaterial = new THREE.MeshBasicMaterial({ color: 0x00ffff });
+        const energyBall = new THREE.Mesh(energyBallGeometry, energryBallMaterial);
+
+      
+        energyBall.position.copy(this.mesh.position);
+        energyBall.position.z += 0.5;
+
+        this.scene.add(energyBall);
+        this.energyBalls.push(energyBall);
     }
 }
