@@ -18,6 +18,7 @@ export class AlienMothership {
         const bodyMaterial = new THREE.MeshPhongMaterial({ color: 0x5555ff, specular: 0x5555ff });
         const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
         this.mesh.add(body);
+        this.mesh.position.z = -10;
 
 
         // Details like antennas or guns

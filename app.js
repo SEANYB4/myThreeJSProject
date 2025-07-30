@@ -611,6 +611,7 @@ document.addEventListener('keydown', function(event) {
 
 // enemies setup
 
+let boss = null;
 
 const aliens = [];
 function spawnAliens() {
@@ -666,6 +667,25 @@ function gameOver() {
 
 }
 
+
+
+function maybeSpawnBoss() {
+    if (score >= 5) {
+        spawnBoss();
+    }
+}
+
+
+function spawnBoss() {
+
+  
+    difficulty = 0;
+
+
+    boss = new AlienMothership(scene);
+
+
+}
 
 
 
@@ -770,6 +790,23 @@ function animate() {
             scene.remove(asteroid);
             asteroids.splice(asteroids.indexOf(asteroid), 1);
         }
+
+
+        if (boss) {
+            if (boss.mesh.position.distanceTo(asteroid.position) < 4.0) {
+
+                audioManager.playSound('asteroidExplosion1');
+                maybeSpawnBonus(asteroid);
+    
+                const fragments = createSmallerAsteroids(asteroid);
+                fragments.forEach(fragment => {
+                    smallerAsteroids.push(fragment);
+                });
+                scene.remove(asteroid);
+                asteroids.splice(asteroids.indexOf(asteroid), 1);
+            }
+        }
+        
     });
 
     updateFragments(smallerAsteroids);
@@ -799,6 +836,13 @@ function animate() {
     checkLaserCollisions();
     checkGrenadeCollisions();
     checkBeamCollisions();
+
+
+    maybeSpawnBoss();
+
+    if (boss) {
+        boss.update();
+    }
 
     if (playerHealth <= 0) {
         gameOver();
