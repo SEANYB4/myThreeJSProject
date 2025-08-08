@@ -147,6 +147,7 @@ export class AlienMothership {
         if (this.health <= 0) {
             this.destroy();
         }
+        this.updateHealthBar();
     }
 
 
@@ -154,6 +155,47 @@ export class AlienMothership {
 
         this.isAlive = false;
         this.scene.remove(this.mesh);
+       
+        // Correctly remove all lasers
+        while (this.lasers.length > 0) {
+
+            let laser = this.lasers.pop();
+            this.scene.remove(laser);
+        }
+
+
+        // Correctly remove all energy Balls
+        while (this.energyBalls.length > 0) {
+
+            let energyBall = this.energyBalls.pop();
+            this.scene.remove(energyBall);
+        }   
+
+
+
+        const healthBarContainer = document.getElementById('bossHealthContainer');
+        if (healthBarContainer) {
+            healthBarContainer.style.display = 'none';
+        }
+    }
+
+
+    updateHealthBar() {
+
+        const healthPercentage = this.health / 100;
+        const healthBar = document.getElementById('bossHealthBar');
+        if (healthBar) {
+            healthBar.style.width = `${healthPercentage * 100}%`;
+            if (healthPercentage < 0.3) {
+                healthBar.style.backgroundColor = 'red';
+
+            } else if (healthPercentage < 0.6) {
+
+                healthBar.style.backgroundColor = 'yellow';
+            } else {
+                healthBar.style.backgroundColor = 'green';
+            }
+        }
     }
 
 

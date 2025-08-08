@@ -372,7 +372,9 @@ function checkLaserCollisions() {
         if (boss) {
             if (laser.position.distanceTo(boss.mesh.position) < 5) {
 
-                boss.takeDamage(20);
+                boss.takeDamage(5);
+                scene.remove(laser);
+                lasers.splice(lasers.indexOf(laser), 1);
 
             }
         }
@@ -429,8 +431,10 @@ function checkGrenadeCollisions() {
         if (boss) {
             if (grenade.position.distanceTo(boss.mesh.position) < 5) {
     
-                boss.takeDamage(100);
+                boss.takeDamage(20);
                 console.log('boss hit with grenade!');
+                scene.remove(grenade);
+                grenades.splice(grenades.indexOf(grenade), 1);
             }
             
         }
@@ -448,6 +452,8 @@ function checkBossAttackCollisions() {
             if (laser.position.distanceTo(spaceship.position) < 1 && !shieldActivated) {
     
                 playerHealth -= 20;
+                scene.remove(laser);
+                boss.lasers.splice(boss.lasers.indexOf(laser), 1);
             }
     
     
@@ -459,7 +465,9 @@ function checkBossAttackCollisions() {
 
         if (energyBall.position.distanceTo(spaceship.position) < 1 && !shieldActivated) {
 
-            playerHealth -= 50;
+            playerHealth -= 30;
+            scene.remove(energyBall);
+            boss.energyBalls.splice(boss.energyBalls.indexOf(energyBall), 1);
         }
     })
 
@@ -564,9 +572,9 @@ function checkBeamCollisions() {
     });
 
     if (boss) {
-        if ((Math.abs(spaceship.position.x - boss.mesh.position.x) < 2) && (Math.abs(spaceship.position.x - boss.mesh.position.y) < 2) && beamActive) {
+        if ((Math.abs(spaceship.position.x - boss.mesh.position.x) < 5) && (Math.abs(spaceship.position.x - boss.mesh.position.y) < 5) && beamActive) {
 
-            boss.takeDamage(100);
+            boss.takeDamage(10);
             console.log('boss hit with beam!');
         }
         
@@ -617,6 +625,8 @@ function checkBeamCollisions() {
         alien.energyBalls.forEach(energyBall => {
             if (energyBall.position.distanceTo(spaceship.position) < 2 && !shieldActivated) {
                 playerHealth -= 50;
+                scene.remove(energyBall);
+                alien.energyBalls.splice(alien.energyBalls.indexOf(energyBall), 1);
             }
 
         })
@@ -809,15 +819,13 @@ function maybeSpawnBoss() {
 }
 
 
-function spawnBoss() {
-
-  
+function spawnBoss() {  
     difficulty = 0;
-
-
     boss = new AlienMothership(scene);
-
-
+    const healthBarContainer = document.getElementById('bossHealthContainer');
+    if (healthBarContainer) {
+        healthBarContainer.style.display = 'block';
+    }
 }
 
 

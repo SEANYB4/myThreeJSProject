@@ -128,6 +128,17 @@ export class AlienSpaceship {
 
     remove() {
         this.scene.remove(this.mesh);
+        while (this.lasers.length > 0) {
+
+            let laser = this.lasers.pop();
+            this.scene.remove(laser);
+        }
+
+        while (this.energyBalls.length > 0) {
+
+            let energyBall = this.energyBalls.pop();
+            this.scene.remove(energyBall);
+        }
     }
 
 
