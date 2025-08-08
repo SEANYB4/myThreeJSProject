@@ -2,6 +2,64 @@ import { AlienSpaceship } from './enemies.js';
 import { AlienMothership } from './boss.js';
 import { AudioManager } from './audio.js';
 
+
+
+
+// DATABASE SETUP
+
+const supabaseUrl = 'https://drbpkekgxqxonjomngcz.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRyYnBrZWtneHF4b25qb21uZ2N6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5MTE1MTQsImV4cCI6MjA2OTQ4NzUxNH0.O1XLfHnVLtP1Y_osLywGcJwgRfcql9s3vfqU5lHMwSs';
+
+// Create a single supabase client for interacting with your database
+const Supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+async function fetchTopScores() {
+
+    const { data, error } = await Supabase
+    .from('scores')
+    .select('*')
+    .order('score', { ascending: false})
+    .limit(10)
+
+    if (error) console.error('Error fetching scores: ', error);
+    else return data;
+
+}
+
+async function submitScore(score) {
+
+    const name = prompt('Please enter your name: ');
+
+    const {data, error } = await Supabase
+    .from('scores')
+    .insert([
+        { name: name, score: score }
+    ]);
+
+    if (error) console.error('Error saving score: ', error);
+    else console.log('Score saved successfully!', data);
+}
+
+
+async function updateLeaderBoard() {
+
+    const scores = await fetchTopScores();
+    const scoresList = document.getElementById('scores');
+    scoresList.innerHTML = '';
+    const title = document.createElement('h2');
+    title.innerHTML = 'SCORES:';
+    scoresList.appendChild(title);
+    scores.forEach(score => {
+
+        const item = document.createElement('li');
+        item.textContent = `${score.name}: ${score.score}`;
+        scoresList.appendChild(item);
+    
+    });
+    scoresList.style = 'display: block; position: absolute; top:60%; left: 10%; transform: translate(-50%, -50%); color: blue; font-size: 3em; z-index: 1000; font-family: Permanent Marker, cursive; list-style: none;';
+}
+
+
 // THREE.JS ENVIRONMENT SETUP
 
 
@@ -45,6 +103,7 @@ audioManager.loadSound('enemyDeath1', './Audio/enemyDeath1.mp3');
 audioManager.loadSound('playerHit', './Audio/playerHit.mp3');
 audioManager.loadSound('gameOver', './Audio/game_over.mp3');
 audioManager.loadSound('powerUp', './Audio/powerUp.mp3');
+audioManager.loadSound('music1', './Audio/tanks.mp3');
 
 
 // SPACESHIP 
@@ -309,6 +368,15 @@ function checkLaserCollisions() {
                 lasers.splice(lasers.indexOf(laser), 1);
             }
         });
+
+        if (boss) {
+            if (laser.position.distanceTo(boss.mesh.position) < 5) {
+
+                boss.takeDamage(20);
+
+            }
+        }
+    
     });
 
 }
@@ -358,9 +426,48 @@ function checkGrenadeCollisions() {
             }
         });
         
-
+        if (boss) {
+            if (grenade.position.distanceTo(boss.mesh.position) < 5) {
+    
+                boss.takeDamage(100);
+                console.log('boss hit with grenade!');
+            }
+            
+        }
 
     });
+
+  
+}
+
+
+function checkBossAttackCollisions() {
+    if (boss) {
+        boss.lasers.forEach((laser) => {
+        
+            if (laser.position.distanceTo(spaceship.position) < 1 && !shieldActivated) {
+    
+                playerHealth -= 20;
+            }
+    
+    
+    });
+
+
+    boss.energyBalls.forEach((energyBall) => {
+
+
+        if (energyBall.position.distanceTo(spaceship.position) < 1 && !shieldActivated) {
+
+            playerHealth -= 50;
+        }
+    })
+
+    }
+
+  
+
+
 }
 
 
@@ -456,14 +563,29 @@ function checkBeamCollisions() {
         }
     });
 
+    if (boss) {
+        if ((Math.abs(spaceship.position.x - boss.mesh.position.x) < 2) && (Math.abs(spaceship.position.x - boss.mesh.position.y) < 2) && beamActive) {
 
+            boss.takeDamage(100);
+            console.log('boss hit with beam!');
+        }
+        
+    }
+    
     aliens.forEach((alien) => {
 
 
         if ((Math.abs(spaceship.position.x - alien.mesh.position.x) < 1) && (Math.abs(spaceship.position.y - alien.mesh.position.y) < 1) && beamActive) {
 
             alien.health -= 100;
+            score++;
         }
+
+
+
+
+
+        // CHECK ALIEN BEAM COLLISIONS
 
         if (alien.beamActive && alien.beam) {
            
@@ -476,19 +598,21 @@ function checkBeamCollisions() {
             // Check collision with asteroids
 
 
-            // asteroids.forEach((asteroid, index) => {
-            //     if (alien.beam.position.distanceTo(asteroid.position) < 1) {
-            //         const fragments = createSmallerAsteroids(asteroid);
-            //         fragments.forEach(fragment => {
-            //             smallerAsteroids.push(fragment);
-            //         });
-            //         scene.remove(asteroid);
-            //         asteroids.splice(asteroids.indexOf(asteroid), 1);
-            //     }
-            // });
+            asteroids.forEach((asteroid, index) => {
+                if (alien.beam.position.distanceTo(asteroid.position) < 1) {
+                    const fragments = createSmallerAsteroids(asteroid);
+                    fragments.forEach(fragment => {
+                        smallerAsteroids.push(fragment);
+                    });
+                    scene.remove(asteroid);
+                    asteroids.splice(asteroids.indexOf(asteroid), 1);
+                }
+            });
 
         }
 
+
+        // CHECK ALIEN ENERGY BALL COLLISIONS
 
         alien.energyBalls.forEach(energyBall => {
             if (energyBall.position.distanceTo(spaceship.position) < 2 && !shieldActivated) {
@@ -665,12 +789,16 @@ function gameOver() {
     cancelAnimationFrame(animationId);
     audioManager.playSound('gameOver');
 
+    submitScore(score);
+ 
+    updateLeaderBoard();
+
 }
 
 
 
 function maybeSpawnBoss() {
-    if (score >= 5) {
+    if (difficulty >= 5 && !boss) {
         spawnBoss();
     }
 }
@@ -693,12 +821,25 @@ function spawnBoss() {
 // animation setup
 
 let animationId = null;
+let musicPlaying = false;
 
+function playMusic() {
+    if (!musicPlaying) {
+        try {
+            audioManager.playSound('music1');
+            musicPlaying = true;
+        } catch (error) {
+            
+            console.log(error);
+        }
+       
+    }
+}
 
 // Animation loop
 function animate() {
 
-
+    playMusic();
 
     animationId = requestAnimationFrame(animate);
 
@@ -793,7 +934,7 @@ function animate() {
 
 
         if (boss) {
-            if (boss.mesh.position.distanceTo(asteroid.position) < 4.0) {
+            if (boss.mesh.position.distanceTo(asteroid.position) < 6.0) {
 
                 audioManager.playSound('asteroidExplosion1');
                 maybeSpawnBonus(asteroid);
@@ -836,8 +977,15 @@ function animate() {
     checkLaserCollisions();
     checkGrenadeCollisions();
     checkBeamCollisions();
+    checkBossAttackCollisions();
 
-
+    if (boss) {
+        if (!boss.isAlive) {
+            boss = null;
+            difficulty = 1;
+        }
+    }
+   
     maybeSpawnBoss();
 
     if (boss) {

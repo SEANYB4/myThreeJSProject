@@ -30,5 +30,6 @@ export class AudioManager {
             return soundSource;
         }
         console.error('Sound not found: ', name);
+        throw error;
     }
 }

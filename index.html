@@ -8,6 +8,7 @@
         body { margin: 0; }
         canvas { display: block; }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.153.0/build/three.min.js"></script>
     <script src="./app.js" type="module"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,5 +20,6 @@
     <div id="grenades" style="position: absolute; top: 20%; left: 20%; transform: translate(-50%, -50%); color: white; font-size: 3em; z-index: 1000; font-family: Permanent Marker, cursive;"></div>
     <div id="score" style="position: absolute; top: 10%; left: 80%; transform: translate(-50%, -50%); color: white; font-size: 3em; z-index: 1000; font-family: Permanent Marker, cursive;"></div>
     <div id="gameOverMessage" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: lightgreen; font-size: 3em; z-index: 1000; font-family: Permanent Marker, cursive;">GAME OVER!!!</div>
+    <div id="scores" style="display: none; position: absolute; top:60%; left: 50%; transform: translate(-50%, -50%); color: blue; font-size: 3em; z-index: 1000; font-family: Permanent Marker, cursive;"></div>
 </body>
 </html>
