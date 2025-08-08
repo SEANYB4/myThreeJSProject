@@ -786,6 +786,11 @@ setInterval(spawnAliens, Math.random() * 5000 + 2000);
 function gameOver() {
 
     document.getElementById('gameOverMessage').style.display = 'block';
+    document.getElementById('controls1').style.display = 'block';
+    document.getElementById('controls2').style.display = 'block';
+    document.getElementById('controls3').style.display = 'block';
+    document.getElementById('controls4').style.display = 'block';
+    document.getElementById('controls5').style.display = 'block';
     cancelAnimationFrame(animationId);
     audioManager.playSound('gameOver');
 
