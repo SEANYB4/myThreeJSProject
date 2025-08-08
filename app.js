@@ -1,7 +1,7 @@
 import { AlienSpaceship } from './enemies.js';
 import { AlienMothership } from './boss.js';
 import { AudioManager } from './audio.js';
-
+import { AlienInterceptor } from './interceptor.js';
 
 
 
@@ -104,6 +104,8 @@ audioManager.loadSound('playerHit', './Audio/playerHit.mp3');
 audioManager.loadSound('gameOver', './Audio/game_over.mp3');
 audioManager.loadSound('powerUp', './Audio/powerUp.mp3');
 audioManager.loadSound('music1', './Audio/tanks.mp3');
+audioManager.loadSound('ambience', './Audio/ambience.mp3');
+audioManager.loadSound('alien1', './Audio/alien1.mp3');
 
 
 // SPACESHIP 
@@ -205,7 +207,7 @@ function deactivateBeam() {
 // GAME VARIABLES
 
 let playerHealth = 100;
-let score = 0;
+export let score = 0;
 let difficulty = 1;
 
 
@@ -351,6 +353,20 @@ function checkLaserCollisions() {
             }
         });
 
+        interceptors.forEach(interceptor => {
+
+
+            if (laser.position.distanceTo(interceptor.mesh.position) < 1) {
+                interceptor.health -= 40;
+                scene.remove(laser);
+                lasers.splice(lasers.indexOf(laser), 1);
+            
+            }
+
+
+        });
+
+
         aliens.forEach(alien => {
             if (laser.position.distanceTo(alien.mesh.position) < 1) {
                 console.log("Alien spaceship hit!");
@@ -408,6 +424,18 @@ function checkGrenadeCollisions() {
 
 
         });
+
+        interceptors.forEach(interceptor => {
+
+
+            if (grenade.position.distanceTo(interceptor.mesh.position) < 5) {
+                interceptor.health -= 50;
+              
+                scene.remove(grenade);
+                grenades.splice(grenades.indexOf(grenade), 1);
+
+            }
+        })
 
 
         aliens.forEach(alien => {
@@ -579,6 +607,15 @@ function checkBeamCollisions() {
         }
         
     }
+
+    interceptors.forEach(interceptor => {
+
+        if (Math.abs(spaceship.position.x - interceptor.mesh.position.x) < 1 && Math.abs(spaceship.position.y - interceptor.mesh.position.y) < 1) {
+
+            interceptor.health -= 50;
+        }
+
+    });
     
     aliens.forEach((alien) => {
 
@@ -748,12 +785,21 @@ document.addEventListener('keydown', function(event) {
 let boss = null;
 
 const aliens = [];
+const interceptors = [];
 function spawnAliens() {
 
     if (aliens.length < difficulty) {
         const alien = new AlienSpaceship(scene);
         aliens.push(alien);
     } 
+
+    if (interceptors.length < difficulty) {
+
+        const interceptor = new AlienInterceptor(scene);
+        interceptors.push(interceptor);
+}
+
+
 }
 
 let globalLasers = [];
@@ -784,6 +830,27 @@ function updateAlienLasers() {
     
 }
 
+
+function checkPlasmaBurstCollisions() {
+
+
+    interceptors.forEach(interceptor => {
+
+
+        interceptor.plasmaBursts.forEach((plasmaBurst) => {
+
+            if (plasmaBurst.position.distanceTo(spaceship.position) < 1) {
+                
+                playerHealth -= 10;
+                scene.remove(plasmaBurst);
+                interceptor.plasmaBursts.splice(plasmaBursts.indexOf(plasmaBurst), 1);
+            }
+
+
+        });
+
+    });
+}
 
 
 
@@ -822,6 +889,7 @@ function maybeSpawnBoss() {
 function spawnBoss() {  
     difficulty = 0;
     boss = new AlienMothership(scene);
+    audioManager.playSound('alien1');
     const healthBarContainer = document.getElementById('bossHealthContainer');
     if (healthBarContainer) {
         healthBarContainer.style.display = 'block';
@@ -835,11 +903,12 @@ function spawnBoss() {
 
 let animationId = null;
 let musicPlaying = false;
+let ambiencePlaying = false;
 
 function playMusic() {
     if (!musicPlaying) {
         try {
-            audioManager.playSound('music1');
+            audioManager.playSound('music1', { volume: 3});
             musicPlaying = true;
         } catch (error) {
             
@@ -849,10 +918,25 @@ function playMusic() {
     }
 }
 
+
+function playAmbience() {
+
+    if (!ambiencePlaying) {
+
+        try {
+            audioManager.playSound('ambience', { volume: 3});
+            ambiencePlaying = true;
+        } catch (error) {
+            console.log(error);
+        }
+    }
+}
+
 // Animation loop
 function animate() {
 
     playMusic();
+    playAmbience();
 
     animationId = requestAnimationFrame(animate);
 
@@ -977,10 +1061,16 @@ function animate() {
         alien.lasers = [];
 
         if (alien.health <= 0) {
-            scene.remove(alien.mesh);
+            alien.remove();
             aliens.splice(aliens.indexOf(alien), 1);
         }
     
+    });
+
+    interceptors.forEach(interceptor => {
+
+        interceptor.update();
+
     });
 
     updateAlienLasers();
@@ -991,6 +1081,10 @@ function animate() {
     checkGrenadeCollisions();
     checkBeamCollisions();
     checkBossAttackCollisions();
+
+
+    checkPlasmaBurstCollisions();
+
 
     if (boss) {
         if (!boss.isAlive) {

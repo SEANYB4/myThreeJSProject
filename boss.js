@@ -112,7 +112,40 @@ export class AlienMothership {
   
     }
 
-
+    attack3() {
+        console.log('boss executing shockwave attack');
+    
+        const numPulses = 12; // Number of pulses in the shockwave
+        const pulseRadius = 1; // Radius of each pulse
+    
+        for (let i = 0; i < numPulses; i++) {
+            const angle = (Math.PI * 2 / numPulses) * i; // Angle for each pulse in radians
+            const pulseGeometry = new THREE.SphereGeometry(pulseRadius, 16, 16);
+            const pulseMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000, transparent: true, opacity: 0.8 });
+            const pulse = new THREE.Mesh(pulseGeometry, pulseMaterial);
+    
+            // Positioning the pulses in a circle around the boss
+            pulse.position.x = this.mesh.position.x + 5 * Math.cos(angle); // 5 is the distance from the center
+            pulse.position.y = this.mesh.position.y + 5 * Math.sin(angle);
+            pulse.position.z = this.mesh.position.z;
+    
+            // Animating the pulses moving outward
+            const moveOutward = () => {
+                requestAnimationFrame(moveOutward);
+                pulse.position.x += 0.1 * Math.cos(angle);
+                pulse.position.y += 0.1 * Math.sin(angle);
+    
+                // Removing the pulse if it moves beyond a certain distance
+                if (Math.abs(pulse.position.x - this.mesh.position.x) > 20 || Math.abs(pulse.position.y - this.mesh.position.y) > 20) {
+                    this.scene.remove(pulse);
+                }
+            }
+            moveOutward();
+    
+            this.scene.add(pulse);
+            this.energyBalls.push(pulse);
+        }
+    }
 
 
 
@@ -235,6 +268,10 @@ export class AlienMothership {
         if (Math.random() * 10 > 9.9) {
 
             this.attack2();
+        }
+
+        if (Math.random() * 10 > 9.9) {
+            this.attack3();
         }
     }
 
