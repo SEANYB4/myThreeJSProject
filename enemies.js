@@ -1,4 +1,4 @@
-import audioManager from "./app.js";
+import audioManager, { updateScore } from "./app.js";
 import { spaceship } from "./app.js";
 
 export class AlienSpaceship {
@@ -45,6 +45,12 @@ export class AlienSpaceship {
         this.beamActive = false;
     }
 
+    changeFormation() { 
+
+        this.velocity = new THREE.Vector3(Math.random(), Math.random(), 0.1);
+
+    }
+
     createSpaceship() {
         // Main body - a torus for a futuristic look
         const bodyGeometry = new THREE.TorusGeometry(0.5, 0.2, 16, 100);
@@ -86,7 +92,7 @@ export class AlienSpaceship {
         this.boundaryCheck();
         this.attemptToShoot();
 
-        this.maybeActivateBeam();
+        //this.maybeActivateBeam();
 
         if (Math.random() < 0.001) {
             this.shootEnergyBall();
@@ -94,14 +100,12 @@ export class AlienSpaceship {
 
         if (this.beam) {
             this.beam.position.copy(this.mesh.position);
-            this.beam.position.z += 25;
+            
         }
 
 
         this.energyBalls.forEach((energyBall, index) => {
-            const sourcePosition = energyBall.position;
-            const targetPosition = spaceship.position;
-
+        
             const moveVector = new THREE.Vector3(0, 0, 0.5);
 
             energyBall.position.add(moveVector);
@@ -110,9 +114,12 @@ export class AlienSpaceship {
         });
 
 
+        if (Math.random() > 0.992) {
+            this.changeFormation();
+        }
+
 
     }
-
 
 
 
@@ -139,6 +146,8 @@ export class AlienSpaceship {
             let energyBall = this.energyBalls.pop();
             this.scene.remove(energyBall);
         }
+
+        updateScore(1);
     }
 
 
@@ -166,11 +175,9 @@ export class AlienSpaceship {
 
     shootEnergyBall() {
 
-
         const energyBallGeometry = new THREE.SphereGeometry(1, 32, 32);
         const energryBallMaterial = new THREE.MeshBasicMaterial({ color: 0x00ffff });
         const energyBall = new THREE.Mesh(energyBallGeometry, energryBallMaterial);
-
       
         energyBall.position.copy(this.mesh.position);
         energyBall.position.z += 0.5;

@@ -13,15 +13,17 @@
     <script src="./app.js" type="module"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="stylesheet" href="styles.css">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div id="health" style="position: absolute; top: 10%; left: 20%; transform: translate(-50%, -50%); color: white; font-size: 3em; z-index: 1000; font-family: Permanent Marker, cursive;"></div>
+
+    <img id="startMenuBackground" src="./Images/startScreen.png" alt="background">
+    <div id="health" style="position: absolute; top: 10%; left: 20%; transform: translate(-50%, -50%); color: white; font-size: 3em; z-index: 1000; font-family: Permanent Marker, cursive; display: none;"></div>
     <div id="grenades" style="position: absolute; top: 20%; left: 20%; transform: translate(-50%, -50%); color: white; font-size: 3em; z-index: 1000; font-family: Permanent Marker, cursive;"></div>
     <div id="score" style="position: absolute; top: 10%; left: 80%; transform: translate(-50%, -50%); color: white; font-size: 3em; z-index: 1000; font-family: Permanent Marker, cursive;"></div>
     <div id="gameOverMessage" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: lightgreen; font-size: 3em; z-index: 1000; font-family: Permanent Marker, cursive;">GAME OVER!!!</div>
-    <div id="scores" style="display: none; position: absolute; top:60%; left: 50%; transform: translate(-50%, -50%); color: blue; font-size: 3em; z-index: 1000; font-family: Permanent Marker, cursive;"></div>
+    <div id="scores" style="display: none; position: absolute; top:60%; left: 10%; transform: translate(-50%, -50%); color: blue; font-size: 3em; z-index: 1000; font-family: Permanent Marker, cursive;"></div>
     <div id="controls1" style="display: none; position: absolute; top:60%; left: 70%; color: red; font-size: 3em; z-index: 1000; font-family: Permanent Marker, cursive;">
         Fire: Space
     </div>
@@ -48,7 +50,15 @@
 
         <div id="bossHealthBar"></div>
     </div>
+
+
+    <div id="playerHealthContainer">
+        <div id="playerHealthBar"></div>
+    </div>
    
+    <div id="startMenu">Start Game</div>
+
+    
 
 </body>
 </html>

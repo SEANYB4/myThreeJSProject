@@ -1,7 +1,8 @@
 
 import { updateScore } from "./app.js";
 
-export class AlienMothership {
+
+export class AlienMothership2 {
 
     constructor(scene) {
 
@@ -22,16 +23,15 @@ export class AlienMothership {
 
 
         // Main body with improved material
-        const bodyGeometry = new THREE.SphereGeometry(5, 32, 32);
-        const bodyMaterial = new THREE.MeshPhongMaterial({ color: 0x5555ff, shininess: 150, specular: 0x888888 });
+        const bodyGeometry = new THREE.SphereGeometry(5, 64, 64);
+        const bodyMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, shininess: 150, specular: 0x888888 });
         const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
         this.mesh.add(body);
 
         // Appendages enhanced
         const appendageGeometry = new THREE.ConeGeometry(0.5, 2, 32);
         const appendageMaterial = new THREE.MeshPhongMaterial({ color: 0xff5555, specular: 0x222222 });
-
-        for (let i = 0; i < 6; i++) {
+        for (let i = 0; i < 6; i++) { // Increased number for a more menacing look
             const appendage = new THREE.Mesh(appendageGeometry, appendageMaterial);
             appendage.position.set(Math.cos(i * Math.PI / 3) * 5, Math.sin(i * Math.PI / 3) * 5, 0);
             appendage.rotation.z = i * Math.PI / 3 + Math.PI / 2;
@@ -71,16 +71,19 @@ export class AlienMothership {
       laser.rotation.x = Math.PI / 2;
       this.lasers.push(laser);
       this.scene.add(laser);
-
-     
+      // Assuming audioManager exists and is initialized
+      //audioManager.playSound('laser_fire'); // Ensure sound name matches your files
     }
 
 
     attack2() {
         console.log('boss attacking');
 
+
+
         const gridSize = 3;
         const spacing = 2;
+
 
         const startOffset = -(gridSize - 1) / 2 * spacing;
 
@@ -100,8 +103,11 @@ export class AlienMothership {
                 this.scene.add(energyBall);
                 this.energyBalls.push(energyBall);
     
+    
             }
         }
+        
+  
     }
 
     attack3() {
@@ -157,7 +163,6 @@ export class AlienMothership {
 
                 this.mesh.position.lerpVectors(startPosition, endPosition, fraction);
                 requestAnimationFrame(animatePosition);
-
             } else {
                 this.mesh.position.set(x, y, z);
             }
@@ -251,7 +256,6 @@ export class AlienMothership {
 
         this.maybeAttack();
         this.updateHealthBar();
-        
     }
 
     maybeAttack() {
@@ -269,6 +273,7 @@ export class AlienMothership {
         if (Math.random() * 10 > 9.95) {
             this.attack3();
         }
+       
     }
 
 }

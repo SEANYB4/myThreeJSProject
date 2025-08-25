@@ -1,9 +1,22 @@
 import { AlienSpaceship } from './enemies.js';
 import { AlienMothership } from './boss.js';
+import { AlienMothership2 } from './boss 2.js';
 import { AudioManager } from './audio.js';
 import { AlienInterceptor } from './interceptor.js';
+import { MessageManager } from './messages.js';
+import { Spaceship } from './player.js';
 
 
+const startMenu = document.getElementById('startMenu');
+const startMenuBackground = document.getElementById('startMenuBackground');
+
+startMenu.addEventListener('click', () => {
+
+    startMenu.style.display = 'none';
+    startMenuBackground.style.display = 'none';
+    
+    animate();
+})
 
 // DATABASE SETUP
 
@@ -56,11 +69,31 @@ async function updateLeaderBoard() {
         scoresList.appendChild(item);
     
     });
-    scoresList.style = 'display: block; position: absolute; top:60%; left: 10%; transform: translate(-50%, -50%); color: blue; font-size: 3em; z-index: 1000; font-family: Permanent Marker, cursive; list-style: none;';
+    scoresList.style.display = 'block';
 }
 
 
 // THREE.JS ENVIRONMENT SETUP
+
+
+
+// LOADING TEXTURES
+const textureLoader = new THREE.TextureLoader();
+const grenadeTexture = textureLoader.load(
+    '',
+    () => {
+        console.log('Texture loaded successfully');
+    }, 
+    undefined,
+    (error) => {
+        console.error('Error loading texture');
+    }
+);
+
+
+
+
+
 
 
 const scene = new THREE.Scene();
@@ -106,116 +139,34 @@ audioManager.loadSound('powerUp', './Audio/powerUp.mp3');
 audioManager.loadSound('music1', './Audio/tanks.mp3');
 audioManager.loadSound('ambience', './Audio/ambience.mp3');
 audioManager.loadSound('alien1', './Audio/alien1.mp3');
+audioManager.loadSound('message', './Audio/message.mp3');
 
+
+
+// MESSAGES
+
+const messageManager = new MessageManager(scene);
+const messages = ["Attention, Pilot! Intelligence reports enemy activity in the Nebula Sector.",  "Your mission is to scout the area and engage any hostile forces.", "Maintain radio silence until further notice. Stay sharp out there!", "Update: We've detected a high-value target entering your vicinity.", "This is a critical opportunity. Use extreme caution, but do not let them escape.",  "This is a direct order!", "Immediate attention required! Our sensors have picked up a massive energy spike from your location—it's a trap!", "Initiate evasive maneuvers now and prepare for heavy resistance.", "Survival is your top priority. Do whatever it takes to get out of there intact!"];
+//messageManager.startPeriodicMessages(messages, 5000); 
 
 // SPACESHIP 
 
-export const spaceship = new THREE.Group();
-
-// Main body
-const bodyGeometry = new THREE.CylinderGeometry(0.5, 0.5, 3, 32);
-const bodyMaterial = new THREE.MeshPhongMaterial({ color: 0x778899 });
-const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-body.rotation.x = Math.PI / 2;
-spaceship.add(body);
-
-// Cockpit
-const cockpitGeometry = new THREE.SphereGeometry(0.5, 32, 32);
-const cockpitMaterial = new THREE.MeshPhongMaterial({ color: 0x808080, transparent: true, opacity: 0.8 });
-const cockpit = new THREE.Mesh(cockpitGeometry, cockpitMaterial);
-cockpit.position.z = 0.8;
-cockpit.scale.set(0.5, 0.5, 0.75); // Flatten the sphere a bit
-spaceship.add(cockpit);
-
-// Wings
-const wingGeometry = new THREE.BoxGeometry(0.1, 1, 2);
-const wingMaterial = new THREE.MeshPhongMaterial({ color: 0x1E90FF });
-const leftWing = new THREE.Mesh(wingGeometry, wingMaterial);
-const rightWing = new THREE.Mesh(wingGeometry, wingMaterial);
-leftWing.position.y = -1;
-rightWing.position.y = 1;
-spaceship.add(leftWing);
-spaceship.add(rightWing);
-
-// Tail
-const tailGeometry = new THREE.ConeGeometry(0.3, 1, 32);
-const tailMaterial = new THREE.MeshPhongMaterial({ color: 0x696969 });
-const tail = new THREE.Mesh(tailGeometry, tailMaterial);
-tail.position.z = -1.5;
-tail.rotation.x = Math.PI;
-spaceship.add(tail);
-
-// Add the spaceship to the scene
-scene.add(spaceship);
-
-
-
-function createShield() {
-
-    const geometry = new THREE.SphereGeometry(3, 32, 32);
-    const material = new THREE.MeshBasicMaterial({
-        color: 0x0099ff,
-        transparent: true,
-        opacity: 0.1,
-        side: THREE.DoubleSide
-    });
-
-    const shield = new THREE.Mesh(geometry, material);
-    shield.visible = false;
-    return shield;
-}
-
-let shieldActivated = false;
-let shieldCooldown = false;
-const playerShield = createShield();
-spaceship.add(playerShield);
-
-
-let beam = null;
-let beamActive = false;
-let beamDuration = 1000;
-
-function activateBeam() {
-
-
-    const beamGeometry = new THREE.CylinderGeometry(0.1, 0.1, 50, 32);
-    const beamMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 });
-    beam = new THREE.Mesh(beamGeometry, beamMaterial);
-    beam.position.copy(spaceship.position);
-    beam.rotation.x = Math.PI / 2;
-    beam.position.z -= 25;
-
-
-    scene.add(beam);
-    beamActive = true;
-    audioManager.playSound('laser4');
-
-    setTimeout(() => {
-        deactivateBeam();
-    }, beamDuration);
-}
-
-function deactivateBeam() {
-
-    scene.remove(beam);
-    beam = null;
-    beamActive = false;
-}
-
+export const spaceship = new Spaceship(scene);
 
 
 // GAME VARIABLES
 
-let playerHealth = 100;
 export let score = 0;
 let difficulty = 1;
 
 
-let numGrenades = 5;
+export function updateScore(newScore) {
+    score += newScore;
+    difficulty += 1;
+}
 
 
 const powerUpVelocity = 0.2;
-
 
 // Asteroids setup
 const asteroids = [];
@@ -313,7 +264,7 @@ const laserMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
 function shootLaser() {
     const laserGeometry = new THREE.CylinderGeometry(0.05, 0.05, 2, 8);
     const laser = new THREE.Mesh(laserGeometry, laserMaterial);
-    laser.position.set(spaceship.position.x, spaceship.position.y, spaceship.position.z);
+    laser.position.set(spaceship.spaceship.position.x, spaceship.spaceship.position.y, spaceship.spaceship.position.z);
     laser.rotation.x = Math.PI / 2;
     lasers.push(laser);
     scene.add(laser);
@@ -327,7 +278,7 @@ function shootGrenade() {
 
     const sphereGeometry = new THREE.SphereGeometry(3, 32, 32);
     const grenade = new THREE.Mesh(sphereGeometry, laserMaterial);
-    grenade.position.set(spaceship.position.x, spaceship.position.y, spaceship.position.z);
+    grenade.position.set(spaceship.spaceship.position.x, spaceship.spaceship.position.y, spaceship.spaceship.position.z);
     grenades.push(grenade);
     scene.add(grenade);
 
@@ -357,24 +308,19 @@ function checkLaserCollisions() {
 
 
             if (laser.position.distanceTo(interceptor.mesh.position) < 1) {
-                interceptor.health -= 40;
+                interceptor.health -= 50;
                 scene.remove(laser);
                 lasers.splice(lasers.indexOf(laser), 1);
-            
             }
-
 
         });
 
 
         aliens.forEach(alien => {
             if (laser.position.distanceTo(alien.mesh.position) < 1) {
-                console.log("Alien spaceship hit!");
-                score++;
+                console.log("Alien spaceship.spaceship hit!");
                 
-                if (difficulty < 7) {
-                    difficulty++;
-                }
+                
                 scene.remove(alien.beam);
                 alien.energyBalls.forEach(energyBall => scene.remove(energyBall));
                 audioManager.playSound('enemyDeath1');
@@ -429,8 +375,8 @@ function checkGrenadeCollisions() {
 
 
             if (grenade.position.distanceTo(interceptor.mesh.position) < 5) {
-                interceptor.health -= 50;
-              
+                interceptor.health -= 100;
+                
                 scene.remove(grenade);
                 grenades.splice(grenades.indexOf(grenade), 1);
 
@@ -441,11 +387,8 @@ function checkGrenadeCollisions() {
         aliens.forEach(alien => {
             if (grenade.position.distanceTo(alien.mesh.position) < 5) {
                 console.log("Alien spaceship hit!");
-                score++;
-                
-                if (difficulty < 7) {
-                    difficulty++;
-                }
+                updateScore(1);
+            
                 scene.remove(alien.beam);
                 alien.energyBalls.forEach(energyBall => scene.remove(energyBall));
                 audioManager.playSound('enemyDeath1');
@@ -461,6 +404,7 @@ function checkGrenadeCollisions() {
     
                 boss.takeDamage(20);
                 console.log('boss hit with grenade!');
+
                 scene.remove(grenade);
                 grenades.splice(grenades.indexOf(grenade), 1);
             }
@@ -477,27 +421,29 @@ function checkBossAttackCollisions() {
     if (boss) {
         boss.lasers.forEach((laser) => {
         
-            if (laser.position.distanceTo(spaceship.position) < 1 && !shieldActivated) {
+            if (laser.position.distanceTo(spaceship.spaceship.position) < 1 && !spaceship.shieldActivated) {
     
-                playerHealth -= 20;
+                spaceship.playerHealth -= 20;
                 scene.remove(laser);
                 boss.lasers.splice(boss.lasers.indexOf(laser), 1);
             }
-    
-    
     });
 
 
     boss.energyBalls.forEach((energyBall) => {
 
 
-        if (energyBall.position.distanceTo(spaceship.position) < 1 && !shieldActivated) {
+        if (energyBall.position.distanceTo(spaceship.spaceship.position) < 2 && !spaceship.shieldActivated) {
 
-            playerHealth -= 30;
+            spaceship.playerHealth -= 30;
             scene.remove(energyBall);
             boss.energyBalls.splice(boss.energyBalls.indexOf(energyBall), 1);
         }
     })
+
+
+
+  
 
     }
 
@@ -549,22 +495,20 @@ function createPowerUp() {
 
 function updateBonuses() {
 
-
-
     powerUps.forEach(powerUp => {
 
         powerUp.position.z += powerUpVelocity;
         powerUp.rotation.z += 0.01;
         
         // Collision detection
-        if (spaceship.position.distanceTo(powerUp.position) < 1.0 && !shieldActivated) {
+        if (spaceship.spaceship.position.distanceTo(powerUp.position) < 1.0 && !spaceship.shieldActivated) {
            
             
             scene.remove(powerUp);
             powerUps.splice(powerUps.indexOf(powerUp), 1);
 
-            numGrenades = 5;
-            playerHealth = 100;
+            spaceship.numGrenades = 5;
+            spaceship.playerHealth = 100;
 
             audioManager.playSound('powerUp');
      
@@ -582,7 +526,7 @@ function checkBeamCollisions() {
 
     asteroids.forEach((asteroid) => {
 
-        if ((Math.abs(spaceship.position.x - asteroid.position.x) < 1) && (Math.abs(spaceship.position.y - asteroid.position.y) < 1) && beamActive) {
+        if ((Math.abs(spaceship.spaceship.position.x - asteroid.position.x) < 1) && (Math.abs(spaceship.spaceship.position.y - asteroid.position.y) < 1) && spaceship.beamActive) {
 
             scene.remove(asteroid);
             asteroids.splice(asteroids.indexOf(asteroid), 1);
@@ -600,17 +544,17 @@ function checkBeamCollisions() {
     });
 
     if (boss) {
-        if ((Math.abs(spaceship.position.x - boss.mesh.position.x) < 5) && (Math.abs(spaceship.position.x - boss.mesh.position.y) < 5) && beamActive) {
+        if ((Math.abs(spaceship.spaceship.position.x - boss.mesh.position.x) < 5) && (Math.abs(spaceship.spaceship.position.x - boss.mesh.position.y) < 5) && spaceship.beamActive) {
 
             boss.takeDamage(10);
-            console.log('boss hit with beam!');
+            spaceship.deactivateBeam();
         }
         
     }
 
     interceptors.forEach(interceptor => {
 
-        if (Math.abs(spaceship.position.x - interceptor.mesh.position.x) < 1 && Math.abs(spaceship.position.y - interceptor.mesh.position.y) < 1) {
+        if (Math.abs(spaceship.spaceship.position.x - interceptor.mesh.position.x) < 1 && Math.abs(spaceship.spaceship.position.y - interceptor.mesh.position.y) < 1) {
 
             interceptor.health -= 50;
         }
@@ -620,10 +564,9 @@ function checkBeamCollisions() {
     aliens.forEach((alien) => {
 
 
-        if ((Math.abs(spaceship.position.x - alien.mesh.position.x) < 1) && (Math.abs(spaceship.position.y - alien.mesh.position.y) < 1) && beamActive) {
+        if ((Math.abs(spaceship.spaceship.position.x - alien.mesh.position.x) < 1) && (Math.abs(spaceship.spaceship.position.y - alien.mesh.position.y) < 1) && spaceship.beamActive) {
 
             alien.health -= 100;
-            score++;
         }
 
 
@@ -636,8 +579,8 @@ function checkBeamCollisions() {
            
 
             // Check collision with player
-            if ((Math.abs(alien.beam.position.x - spaceship.position.x) < 1) && (Math.abs(alien.beam.position.y - spaceship.position.y) < 1) && !shieldActivated) {
-                playerHealth -= 1;
+            if ((Math.abs(alien.beam.position.x - spaceship.spaceship.position.x) < 1) && (Math.abs(alien.beam.position.y - spaceship.spaceship.position.y) < 1) && !spaceship.shieldActivated) {
+                spaceship.playerHealth -= 1;
             }
 
             // Check collision with asteroids
@@ -660,8 +603,8 @@ function checkBeamCollisions() {
         // CHECK ALIEN ENERGY BALL COLLISIONS
 
         alien.energyBalls.forEach(energyBall => {
-            if (energyBall.position.distanceTo(spaceship.position) < 2 && !shieldActivated) {
-                playerHealth -= 50;
+            if (energyBall.position.distanceTo(spaceship.spaceship.position) < 2 && !spaceship.shieldActivated) {
+                spaceship.playerHealth -= 50;
                 scene.remove(energyBall);
                 alien.energyBalls.splice(alien.energyBalls.indexOf(energyBall), 1);
             }
@@ -711,7 +654,7 @@ function createCrosshair() {
 }
 
 const crosshair = createCrosshair();
-spaceship.add(crosshair);
+spaceship.spaceship.add(crosshair);
 
 
 
@@ -724,50 +667,50 @@ spaceship.add(crosshair);
 camera.position.z = 20;
 
 // Movement controls
-const speed = 0.3;
+const speed = 0.5;
 document.addEventListener('keydown', function(event) {
     switch (event.key) {
         case 'ArrowUp':
-            spaceship.position.y += speed;
+            spaceship.spaceship.position.y += speed;
             break;
         case 'ArrowDown':
-            spaceship.position.y -= speed;
+            spaceship.spaceship.position.y -= speed;
             break;
         case 'ArrowLeft':
-            spaceship.position.x -= speed;
+            spaceship.spaceship.position.x -= speed;
             break;
         case 'ArrowRight':
-            spaceship.position.x += speed;
+            spaceship.spaceship.position.x += speed;
             break;
 
         case 's':
 
-            if (!shieldCooldown) {
+            if (!spaceship.shieldCooldown) {
 
-                playerShield.visible = !playerShield.visible;
-                shieldActivated = !shieldActivated;
-                shieldCooldown = true;
+                spaceship.shield.visible = !spaceship.shield.visible;
+                spaceship.shieldActivated = !spaceship.shieldActivated;
+                spaceship.shieldCooldown = true;
                 setTimeout(() => {
-                    shieldCooldown = false;
-                }, 2000);
+                    spaceship.shieldCooldown = false;
+                }, spaceship.shieldCooldownLength);
                 setTimeout(()=> {   
-                    playerShield.visible = !playerShield.visible;
-                    shieldActivated = !shieldActivated;
-                }, 1000);
+                    spaceship.shield.visible = !spaceship.shield.visible;
+                    spaceship.shieldActivated = !spaceship.shieldActivated;
+                }, spaceship.shieldDuration);
             }
         
             break;
 
         case 'g':
-            if (numGrenades > 0) {
+            if (spaceship.numGrenades > 0) {
                 shootGrenade();
-                numGrenades--;
+                spaceship.numGrenades--;
             }
             break;
 
         case 'b':
-            if (!beamActive) {
-                activateBeam();
+            if (!spaceship.beamActive) {
+                spaceship.activateBeam();
             }
            
             break;
@@ -785,7 +728,7 @@ document.addEventListener('keydown', function(event) {
 let boss = null;
 
 const aliens = [];
-const interceptors = [];
+export const interceptors = [];
 function spawnAliens() {
 
     if (aliens.length < difficulty) {
@@ -797,18 +740,14 @@ function spawnAliens() {
 
         const interceptor = new AlienInterceptor(scene);
         interceptors.push(interceptor);
-}
+    }
 
 
 }
 
 let globalLasers = [];
 
-
 function updateAlienLasers() {
-
- 
-
 
         globalLasers.forEach((laser, index) => {
 
@@ -818,41 +757,37 @@ function updateAlienLasers() {
                 globalLasers.splice(index, 1);
             }
 
-            if (laser.position.distanceTo(spaceship.position) < 1 && !shieldActivated) {
+            if (laser.position.distanceTo(spaceship.spaceship.position) < 1 && !spaceship.shieldActivated) {
                 console.log('Player hit!!!');
 
-                playerHealth -= 10;
+                spaceship.playerHealth -= 10;
                 audioManager.playSound('playerHit');
             }
 
-
-        });
-    
+        });    
 }
 
 
 function checkPlasmaBurstCollisions() {
 
-
     interceptors.forEach(interceptor => {
-
 
         interceptor.plasmaBursts.forEach((plasmaBurst) => {
 
-            if (plasmaBurst.position.distanceTo(spaceship.position) < 1) {
+            if (plasmaBurst.position.distanceTo(spaceship.spaceship.position) < 2) {
                 
-                playerHealth -= 10;
-                scene.remove(plasmaBurst);
-                interceptor.plasmaBursts.splice(plasmaBursts.indexOf(plasmaBurst), 1);
-            }
+                spaceship.playerHealth -= 10;
+                console.log('PLAYER HIT');
 
+                interceptor.plasmaBursts.splice(interceptor.plasmaBursts.indexOf(plasmaBurst), 1);
+                scene.remove(plasmaBurst);
+        
+            }
 
         });
 
     });
 }
-
-
 
 
 // Set random interval for spawning aliens
@@ -862,6 +797,13 @@ setInterval(spawnAliens, Math.random() * 5000 + 2000);
 
 function gameOver() {
 
+    
+    
+
+
+    startMenuBackground.style.display = 'block';
+    document.getElementById('bossHealthBar').style.display = 'none';
+    document.getElementById('bossHealthContainer').style.display = 'none';
     document.getElementById('gameOverMessage').style.display = 'block';
     document.getElementById('controls1').style.display = 'block';
     document.getElementById('controls2').style.display = 'block';
@@ -871,9 +813,12 @@ function gameOver() {
     cancelAnimationFrame(animationId);
     audioManager.playSound('gameOver');
 
-    submitScore(score);
- 
-    updateLeaderBoard();
+
+    setTimeout(() => {
+        submitScore(score);
+        updateLeaderBoard();
+
+    }, 2000);
 
 }
 
@@ -888,12 +833,21 @@ function maybeSpawnBoss() {
 
 function spawnBoss() {  
     difficulty = 0;
-    boss = new AlienMothership(scene);
+
+    if (Math.random() > 0.5) {
+        boss = new AlienMothership(scene);
+    } else {
+        boss = new AlienMothership2(scene);
+    }
+   
     audioManager.playSound('alien1');
     const healthBarContainer = document.getElementById('bossHealthContainer');
     if (healthBarContainer) {
         healthBarContainer.style.display = 'block';
     }
+
+    messageManager.displayMessage(messages[3], 3000, 'Images/commander.png');
+    
 }
 
 
@@ -932,8 +886,14 @@ function playAmbience() {
     }
 }
 
+messageManager.displayMessage(messages[1], 3000, 'Images/commander.png');
+    
+
+
+
 // Animation loop
 function animate() {
+
 
     playMusic();
     playAmbience();
@@ -944,11 +904,11 @@ function animate() {
     // update GUI
 
     document.getElementById('score').innerHTML = `Score: ${score}`;
-    document.getElementById('health').innerHTML = `Player Health: ${playerHealth}`;
-    document.getElementById('grenades').innerHTML = `Grenades: ${numGrenades}`;
+    document.getElementById('health').innerHTML = `Player Health: ${spaceship.playerHealth}`;
+    document.getElementById('grenades').innerHTML = `Grenades: ${spaceship.numGrenades}`;
 
 
-    spaceship.rotation.z += 0.01;
+    spaceship.spaceship.rotation.z += 0.01;
 
      // Move lasers
      lasers.forEach(laser => {
@@ -962,9 +922,9 @@ function animate() {
 
     // Move Beam
 
-    if (beam) {
-        beam.position.copy(spaceship.position);
-        beam.position.z -= 25;
+    if (spaceship.beam) {
+        spaceship.beam.position.copy(spaceship.spaceship.position);
+        spaceship.beam.position.z -= 25;
     }
 
 
@@ -993,7 +953,7 @@ function animate() {
         }
 
         // Collision detection
-        if (spaceship.position.distanceTo(asteroid.position) < 1.0 && !shieldActivated) {
+        if (spaceship.spaceship.position.distanceTo(asteroid.position) < 1.0 && !spaceship.shieldActivated) {
             console.log("Collision Detected!");
             audioManager.playSound('asteroidExplosion1');
             maybeSpawnBonus(asteroid);
@@ -1006,7 +966,7 @@ function animate() {
             asteroids.splice(asteroids.indexOf(asteroid), 1);
 
 
-            playerHealth -= 10;
+            spaceship.playerHealth -= 10;
             audioManager.playSound('playerHit');
             
             // Reset asteroid position after collision
@@ -1017,7 +977,9 @@ function animate() {
            
         }
 
-        if (playerShield.position.distanceTo(asteroid.position) < 4.0 && shieldActivated) {
+        // check for shield collisions with asteroids
+
+        if (spaceship.shield.position.distanceTo(asteroid.position) < 4.0 && spaceship.shieldActivated) {
             audioManager.playSound('asteroidExplosion1');
             maybeSpawnBonus(asteroid);
 
@@ -1095,16 +1057,23 @@ function animate() {
    
     maybeSpawnBoss();
 
+
+
+
     if (boss) {
         boss.update();
+        
     }
 
-    if (playerHealth <= 0) {
+    if (spaceship.playerHealth <= 0) {
         gameOver();
     }
+
+
+    spaceship.updateHealthBar();
    
     renderer.render(scene, camera);
 }
 
-animate();
+
 

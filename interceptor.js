@@ -1,5 +1,5 @@
-import audioManager from "./app.js";
-import { score } from "./app.js";
+import audioManager, { updateScore } from "./app.js";
+import { interceptors } from "./app.js";
 
 export class AlienInterceptor {
 
@@ -73,6 +73,7 @@ export class AlienInterceptor {
 
         if (this.health <= 0) {
             this.remove();
+            updateScore(1);
         }
     }
 
@@ -85,12 +86,14 @@ export class AlienInterceptor {
     }
 
     remove() {
+        audioManager.playSound('enemyDeath1');
         this.scene.remove(this.mesh);
         while (this.plasmaBursts.length > 0) {
             let burst = this.plasmaBursts.pop();
             this.scene.remove(burst);
         }
 
-        score++;
+        interceptors.splice(interceptors.indexOf(this), 1);
+
     }
 }
