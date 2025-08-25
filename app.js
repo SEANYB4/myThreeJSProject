@@ -10,11 +10,16 @@ import { Spaceship } from './player.js';
 const startMenu = document.getElementById('startMenu');
 const startMenuBackground = document.getElementById('startMenuBackground');
 
+const playerHealthBar = document.getElementById('playerHealthBar');
+const playerHealthContainer = document.getElementById('playerHealthContainer');
+
 startMenu.addEventListener('click', () => {
 
     startMenu.style.display = 'none';
     startMenuBackground.style.display = 'none';
     controls.style.display = 'none';
+    playerHealthBar.style.display = 'block';
+    playerHealthContainer.style.display = 'block';
     
     animate();
 })
@@ -701,6 +706,33 @@ camera.position.z = 20;
 
 // Movement controls
 const speed = 0.5;
+
+
+// mobile movement
+
+const leftButton = document.getElementById('move-left');
+const rightButton = document.getElementById('move-right');
+const upButton = document.getElementById('move-up');
+const downButton = document.getElementById('move-down');
+
+
+leftButton.addEventListener('touchstart', () => {
+    spaceship.spaceship.position.x -= speed;
+});
+
+rightButton.addEventListener('touchstart', () => {
+    spaceship.spaceship.position.x += speed;
+});
+
+upButton.addEventListener('touchstart', () => {
+    spaceship.spaceship.position.y -= speed;
+});
+
+downButton.addEventListener('touchstart', () => {
+    spaceship.spaceship.position.y += speed;
+});
+
+
 document.addEventListener('keydown', function(event) {
     switch (event.key) {
         case 'ArrowUp':

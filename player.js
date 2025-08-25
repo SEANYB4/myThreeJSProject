@@ -59,10 +59,8 @@ export class Spaceship {
         this.createShield();
 
         this.healthBar = document.getElementById('playerHealthBar');
-        if (this.healthBar) {
-
-            this.healthBar.style.display = 'block';
-        }
+        this.healthBarContainer = document.getElementById('playerHealthContainer');
+    
     }
 
 
