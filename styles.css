@@ -143,10 +143,12 @@ body, html {
 #touch-controls {
 
     position: absolute;
-    top: 50%;
+  
     left: 10%;
-    height: 300px;
-    width: 300px;
+    height: 200px;
+    width: 200px;
+
+    bottom: 0%;
  
    
 }
@@ -155,10 +157,11 @@ body, html {
 
     background-color: green;
     border-radius: 50%;
-    width: 50px;
-    height: 50px;
+    width: 30px;
+    height: 30px;
     color: white;
     display: none;
+    
     
 }
 
@@ -170,26 +173,26 @@ body, html {
 
     position: absolute;
     left: 0%;
-    top: 50%;
+    top: 75px;
 }
 
 #move-right {
 
     position: absolute;
     right: 0%;
-    top: 50%;
+    top: 75px;
 }
 
 #move-up {
 
     position: absolute;
-    left: 50%;
+    left: 80px;
     top: 0%;
 }
 
 #move-down {
     position: absolute;
-    left: 50%;
+    left: 80px;
     bottom: 0%;
 }
 
@@ -211,30 +214,14 @@ body, html {
         font-size: 18px; /* Slightly smaller font size */
     }
 
-    #touch-controls {
-        bottom: 50px; /* Position at the bottom for easier access */
-        left: 50%;
-        transform: translateX(-50%);
-        width: 100%; /* Take full width at the bottom */
-        height: 120px; /* Enough space for buttons */
-        display: flex;
-        justify-content: space-around; /* Space out buttons */
-        align-items: center;
-    }
+    
 
     #touch-controls div {
         width: 60px; /* Larger touch targets */
         height: 60px;
     }
 
-    #move-left, #move-right, #move-up, #move-down {
-        position: static; /* Remove absolute positioning */
-        margin: 0 10px; /* Add some margin between buttons */
-    }
-
-    #move-up, #move-down {
-        order: -1; /* Move up and down to the left side on mobile */
-    }
+  
 
     * {
         font-size: 16px; /* Reduce font size for all elements */

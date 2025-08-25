@@ -13,6 +13,7 @@ const startMenuBackground = document.getElementById('startMenuBackground');
 const playerHealthBar = document.getElementById('playerHealthBar');
 const playerHealthContainer = document.getElementById('playerHealthContainer');
 
+
 startMenu.addEventListener('click', () => {
 
     startMenu.style.display = 'none';
