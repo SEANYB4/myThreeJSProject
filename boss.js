@@ -48,8 +48,12 @@ export class AlienMothership {
         this.mesh.position.set((Math.random() - 0.5) * 20, (Math.random() - 0.5) * 20, -10);
 
 
+        this.movePositionID = null;
 
-        setInterval(() => {
+        this.attack2ID = null;
+
+
+        this.movePositionID = setInterval(() => {
 
             const newX = (Math.random() - 0.5) * 20;
             const newY = (Math.random() - 0.5) * 20;
@@ -58,6 +62,10 @@ export class AlienMothership {
             this.moveToNewPosition(newX, newY, newZ, 2000);
 
         }, 5000);
+
+        this.attack2ID = setInterval(() => {
+            this.attack2();
+        }, 6000);
     }
 
 
@@ -183,6 +191,9 @@ export class AlienMothership {
         this.scene.remove(this.mesh);
 
         updateScore(5);
+
+        clearInterval(this.movePositionID);
+        clearInterval(this.attack2ID);
        
         // Correctly remove all lasers
         while (this.lasers.length > 0) {
@@ -252,6 +263,7 @@ export class AlienMothership {
         this.maybeAttack();
         this.updateHealthBar();
         
+
     }
 
     maybeAttack() {
@@ -261,10 +273,10 @@ export class AlienMothership {
             this.attack();
         }
 
-        if (Math.random() * 10 > 9.95) {
+        // if (Math.random() * 10 > 9.95) {
 
-            this.attack2();
-        }
+        //     this.attack2();
+        // }
 
         if (Math.random() * 10 > 9.95) {
             this.attack3();

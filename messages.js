@@ -1,5 +1,24 @@
 import audioManager from "./app.js";
 
+
+const cornerRadius = 20;
+
+
+function drawRoundedRect(ctx, x, y, width, height, radius) {
+
+    ctx.beginPath();
+    ctx.moveTo(x + radius, y);
+    ctx.lineTo(x + width - radius, y);
+    ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+    ctx.lineTo(x + width, y + height - radius);
+    ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+    ctx.lineTo(x + radius, y + height);
+    ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+    ctx.lineTo(x, y + radius);
+    ctx.quadraticCurveTo(x, y, x + radius, y);
+    ctx.closePath();
+}
+
 function createTextSprite(message, imageUrl, backgroundColor = 'rgba(0, 0, 240, 0.8', textColor = 'rgba(255, 255, 255, 0.95') {
 
 
@@ -23,13 +42,11 @@ function createTextSprite(message, imageUrl, backgroundColor = 'rgba(0, 0, 240, 
 
            
 
-            // Draw background rectangle
-            context.fillStyle = 'rgba(245, 23, 12, 0.95';
-            context.fillRect(0, 0, canvas.width+10, canvas.height+10);
 
              // Draw background rectangle
              context.fillStyle = backgroundColor;
-             context.fillRect(0, 0, canvas.width, canvas.height);
+             drawRoundedRect(context, 0, 0, canvas.width, canvas.height, cornerRadius);
+             context.fill();
 
             // Draw the image at the left side
             context.drawImage(image, padding, canvas.height/2-imageHeight/2, imageWidth, imageHeight);

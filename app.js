@@ -14,8 +14,32 @@ startMenu.addEventListener('click', () => {
 
     startMenu.style.display = 'none';
     startMenuBackground.style.display = 'none';
+    controls.style.display = 'none';
     
     animate();
+})
+
+const controls = document.getElementById('controls');
+const controlMenu = document.getElementById('controlsMenu');
+
+const backButton = document.getElementById('backButton');
+
+controls.addEventListener('click', () => {
+    startMenu.style.display = 'none';
+    controls.style.display = 'none';
+
+    controlMenu.style.display = 'block';
+    backButton.style.display = 'block';
+
+});
+
+
+backButton.addEventListener('click', () => {
+
+    startMenu.style.display = 'block';
+    controls.style.display = 'block';
+    backButton.style.display = 'none';
+    controlMenu.style.display = 'none';
 })
 
 // DATABASE SETUP
@@ -41,7 +65,7 @@ async function fetchTopScores() {
 
 async function submitScore(score) {
 
-    const name = prompt('Please enter your name: ');
+    const name = prompt('Please enter your name to save your score: ');
 
     const {data, error } = await Supabase
     .from('scores')
@@ -70,6 +94,15 @@ async function updateLeaderBoard() {
     
     });
     scoresList.style.display = 'block';
+    
+    let scoreString = '';
+
+    scores.forEach(score => {
+
+        scoreString += score + '\n';
+    })
+
+    messageManager.displayMessage(scoreString, 5000, null);
 }
 
 
@@ -797,27 +830,22 @@ setInterval(spawnAliens, Math.random() * 5000 + 2000);
 
 function gameOver() {
 
-    
-    
-
 
     startMenuBackground.style.display = 'block';
     document.getElementById('bossHealthBar').style.display = 'none';
     document.getElementById('bossHealthContainer').style.display = 'none';
     document.getElementById('gameOverMessage').style.display = 'block';
-    document.getElementById('controls1').style.display = 'block';
-    document.getElementById('controls2').style.display = 'block';
-    document.getElementById('controls3').style.display = 'block';
-    document.getElementById('controls4').style.display = 'block';
-    document.getElementById('controls5').style.display = 'block';
+
     cancelAnimationFrame(animationId);
     audioManager.playSound('gameOver');
 
 
     setTimeout(() => {
         submitScore(score);
-        updateLeaderBoard();
-
+        setTimeout(() => {
+            updateLeaderBoard();
+        }, 2000)
+        
     }, 2000);
 
 }
@@ -1062,7 +1090,7 @@ function animate() {
 
     if (boss) {
         boss.update();
-        
+
     }
 
     if (spaceship.playerHealth <= 0) {

@@ -47,7 +47,7 @@ export class AlienSpaceship {
 
     changeFormation() { 
 
-        this.velocity = new THREE.Vector3(Math.random(), Math.random(), 0.1);
+        this.velocity = new THREE.Vector3(Math.random() - 0.5, Math.random() - 0.5, 0);
 
     }
 

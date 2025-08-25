@@ -67,9 +67,65 @@
     display: block;
 }
 
+
+#controls {
+    position: absolute;
+    top: 80%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    padding: 20px;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px solid #fff;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    display: block;
+
+}
+
+#controlsMenu {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    padding: 20px;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px solid #fff;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    display: none;
+
+}
+
+
+#backButton {
+
+    position: absolute;
+    top: 80%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    padding: 20px;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px solid #fff;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    display: none;
+
+
+}
+
 #startMenuBackground {
     width: 100vw;
     height: 100vh;
+    z-index: 0;
 }
 
 
@@ -79,3 +135,6 @@ body, html {
     height: 100%;
     width: 100%;
 }
+
+
+
