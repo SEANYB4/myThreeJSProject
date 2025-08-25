@@ -725,11 +725,11 @@ rightButton.addEventListener('touchstart', () => {
 });
 
 upButton.addEventListener('touchstart', () => {
-    spaceship.spaceship.position.y -= speed;
+    spaceship.spaceship.position.y += speed;
 });
 
 downButton.addEventListener('touchstart', () => {
-    spaceship.spaceship.position.y += speed;
+    spaceship.spaceship.position.y -= speed;
 });
 
 

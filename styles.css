@@ -158,6 +158,7 @@ body, html {
     width: 50px;
     height: 50px;
     color: white;
+    display: none;
     
 }
 
@@ -190,4 +191,52 @@ body, html {
     position: absolute;
     left: 50%;
     bottom: 0%;
+}
+
+@media (max-width: 768px) {
+
+    #touch-controls div {
+        display: block;
+    }
+
+    #bossHealthContainer, #playerHealthContainer {
+        width: 90%; /* Full width on smaller screens */
+        left: 50%;
+        transform: translateX(-50%);
+        top: 10px; /* More top space */
+    }
+
+    #startMenu, #controls, #controlsMenu, #backButton {
+        width: 80%; /* Smaller width to fit mobile screens */
+        font-size: 18px; /* Slightly smaller font size */
+    }
+
+    #touch-controls {
+        bottom: 50px; /* Position at the bottom for easier access */
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%; /* Take full width at the bottom */
+        height: 120px; /* Enough space for buttons */
+        display: flex;
+        justify-content: space-around; /* Space out buttons */
+        align-items: center;
+    }
+
+    #touch-controls div {
+        width: 60px; /* Larger touch targets */
+        height: 60px;
+    }
+
+    #move-left, #move-right, #move-up, #move-down {
+        position: static; /* Remove absolute positioning */
+        margin: 0 10px; /* Add some margin between buttons */
+    }
+
+    #move-up, #move-down {
+        order: -1; /* Move up and down to the left side on mobile */
+    }
+
+    * {
+        font-size: 16px; /* Reduce font size for all elements */
+    }
 }
