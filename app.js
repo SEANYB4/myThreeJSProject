@@ -108,7 +108,7 @@ async function updateLeaderBoard() {
         scoreString += score + '\n';
     })
 
-    messageManager.displayMessage(scoreString, 5000, null);
+    
 }
 
 
@@ -717,6 +717,11 @@ const upButton = document.getElementById('move-up');
 const downButton = document.getElementById('move-down');
 
 
+const laserButton = document.getElementById('laserButton');
+const shieldButton = document.getElementById('shieldButton');
+const ionButton = document.getElementById('ionButton');
+const grenadeButton = document.getElementById('grenadeButton');
+
 leftButton.addEventListener('touchstart', () => {
     spaceship.spaceship.position.x -= speed;
 });
@@ -731,6 +736,48 @@ upButton.addEventListener('touchstart', () => {
 
 downButton.addEventListener('touchstart', () => {
     spaceship.spaceship.position.y -= speed;
+});
+
+
+laserButton.addEventListener('touchstart', () => {
+
+    shootLaser();
+});
+
+
+shieldButton.addEventListener('touchstart', () => {
+
+    if (!spaceship.shieldCooldown) {
+
+        spaceship.shield.visible = !spaceship.shield.visible;
+        spaceship.shieldActivated = !spaceship.shieldActivated;
+        spaceship.shieldCooldown = true;
+        setTimeout(() => {
+            spaceship.shieldCooldown = false;
+        }, spaceship.shieldCooldownLength);
+        setTimeout(()=> {   
+            spaceship.shield.visible = !spaceship.shield.visible;
+            spaceship.shieldActivated = !spaceship.shieldActivated;
+        }, spaceship.shieldDuration);
+    }
+
+});
+
+
+ionButton.addEventListener('touchstart', () => {
+
+    if (!spaceship.beamActive) {
+        spaceship.activateBeam();
+    }
+});
+
+
+grenadeButton.addEventListener('touchstart', () => {
+    if (spaceship.numGrenades > 0) {
+        shootGrenade();
+        spaceship.numGrenades--;
+    }
+
 });
 
 
@@ -862,12 +909,13 @@ setInterval(spawnAliens, Math.random() * 5000 + 2000);
 
 
 function gameOver() {
+    document.getElementById('gameOverBackground').style.display = 'block';
 
 
-    startMenuBackground.style.display = 'block';
     document.getElementById('bossHealthBar').style.display = 'none';
     document.getElementById('bossHealthContainer').style.display = 'none';
     document.getElementById('gameOverMessage').style.display = 'block';
+    document.getElementById('grenades').style.display = 'none';
 
     cancelAnimationFrame(animationId);
     audioManager.playSound('gameOver');
@@ -907,7 +955,7 @@ function spawnBoss() {
         healthBarContainer.style.display = 'block';
     }
 
-    messageManager.displayMessage(messages[3], 3000, 'Images/commander.png');
+    messageManager.displayMessage(messages[3], 6000, 'Images/commander.png');
     
 }
 
@@ -947,7 +995,7 @@ function playAmbience() {
     }
 }
 
-messageManager.displayMessage(messages[1], 3000, 'Images/commander.png');
+messageManager.displayMessage(messages[1], 6000, 'Images/commander.png');
     
 
 

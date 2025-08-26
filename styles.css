@@ -1,3 +1,16 @@
+#scores li{
+    font-size: 50px;
+    list-style: none;
+
+}
+
+#scores {
+
+    background-color: purple;
+    border-radius: 5px;
+    padding: 10px;
+}
+
 #bossHealthContainer {
 
     position: fixed;
@@ -129,9 +142,15 @@
 #startMenuBackground {
     width: 100vw;
     height: 100vh;
-    z-index: 0;
+
 }
 
+
+#gameOverBackground {
+
+    width: 100vw;
+    height: 100vh;
+}
 
 body, html {
 
@@ -157,14 +176,43 @@ body, html {
 
     background-color: green;
     border-radius: 50%;
-    width: 30px;
-    height: 30px;
+    width: 60px;
+    height: 60px;
     color: white;
     display: none;
     
     
 }
 
+
+#touch-controls-2 {
+
+    position: absolute;
+  
+    left: 80%;
+    height: 300px;
+    width: 200px;
+
+    bottom: 0%;
+
+   
+ 
+   
+}
+
+#touch-controls-2 div {
+
+    background-color: green;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    color: white;
+    display: block;
+    margin-top: 20px;
+    display: none;
+    
+    
+}
 
 
 
@@ -225,6 +273,11 @@ body, html {
         height: 60px;
     }
 
+
+    #touch-controls-2 div {
+        display: block;
+
+    }
   
 
     * {
