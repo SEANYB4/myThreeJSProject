@@ -16,7 +16,7 @@ export class Spaceship {
         this.shieldActivated = false;
         this.shieldCooldown = false;
 
-        this.shieldCooldownLength = 2000;
+        this.shieldCooldownLength = 8000;
         this.shieldDuration = 4000;
         this.playerHealth = 100;
 
@@ -135,6 +135,20 @@ export class Spaceship {
                 healthBar.style.backgroundColor = 'green';
             }
         }
+    }
+
+
+
+    displayShield() {
+
+        const shieldIndicator = document.getElementById('shieldIndicator');
+        if (this.shieldCooldown) {
+            shieldIndicator.style.backgroundColor = 'grey';
+        } else {
+            shieldIndicator.style.backgroundColor = 'white';
+        }
+
+
     }
 
 }

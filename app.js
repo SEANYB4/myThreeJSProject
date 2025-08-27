@@ -13,6 +13,8 @@ const startMenuBackground = document.getElementById('startMenuBackground');
 const playerHealthBar = document.getElementById('playerHealthBar');
 const playerHealthContainer = document.getElementById('playerHealthContainer');
 
+const restartButton = document.getElementById('restartButton');
+document.getElementById('restartButton').addEventListener('click', restartGame);
 
 startMenu.addEventListener('click', () => {
 
@@ -202,6 +204,11 @@ let difficulty = 1;
 export function updateScore(newScore) {
     score += newScore;
     difficulty += 1;
+}
+
+export function resetScore() {
+    score = 0;
+    difficulty = 1;
 }
 
 
@@ -583,7 +590,7 @@ function checkBeamCollisions() {
     });
 
     if (boss) {
-        if ((Math.abs(spaceship.spaceship.position.x - boss.mesh.position.x) < 5) && (Math.abs(spaceship.spaceship.position.x - boss.mesh.position.y) < 5) && spaceship.beamActive) {
+        if ((Math.abs(spaceship.spaceship.position.x - boss.mesh.position.x) < 6) && (Math.abs(spaceship.spaceship.position.x - boss.mesh.position.y) < 6) && spaceship.beamActive) {
 
             boss.takeDamage(10);
             spaceship.deactivateBeam();
@@ -917,6 +924,8 @@ function gameOver() {
     document.getElementById('gameOverMessage').style.display = 'block';
     document.getElementById('grenades').style.display = 'none';
 
+    
+
     cancelAnimationFrame(animationId);
     audioManager.playSound('gameOver');
 
@@ -925,16 +934,20 @@ function gameOver() {
         submitScore(score);
         setTimeout(() => {
             updateLeaderBoard();
+            restartButton.style.display = 'block';
         }, 2000)
         
     }, 2000);
+
+
+
 
 }
 
 
 
 function maybeSpawnBoss() {
-    if (difficulty >= 5 && !boss) {
+    if (difficulty >= 10 && !boss) {
         spawnBoss();
     }
 }
@@ -1029,6 +1042,9 @@ function animate() {
     });
 
 
+    spaceship.displayShield();
+
+
     // Move Beam
 
     if (spaceship.beam) {
@@ -1078,11 +1094,6 @@ function animate() {
             spaceship.playerHealth -= 10;
             audioManager.playSound('playerHit');
             
-            // Reset asteroid position after collision
-            // asteroid.position.z = 5;
-            // asteroid.position.x = (Math.random() - 0.5) * 10;
-            // asteroid.position.y = (Math.random() - 0.5) * 10;
-
            
         }
 
@@ -1185,4 +1196,51 @@ function animate() {
 }
 
 
+function restartGame() {
+   
+  
+    spaceship.playerHealth = 100;
+
+    // Clear existing game objects
+    asteroids.forEach(asteroid => scene.remove(asteroid));
+    
+    aliens.forEach(alien => alien.remove());
+
+    interceptors.forEach(interceptor => interceptor.remove());
+
+    smallerAsteroids.forEach(smallAsteroid => {
+        scene.remove(smallAsteroid);
+    })
+
+
+    if (boss) {
+        boss.destroy();
+        
+    }
+
+    // Resetting the player's position might be necessary depending on your game design
+    spaceship.spaceship.position.set(0, 0, 0);
+
+    // Restart the game loop
+    if (animationId) {
+        cancelAnimationFrame(animationId);
+    }
+    animate();
+
+    // Hide game over messages and other overlays if existing
+    document.getElementById('gameOverMessage').style.display = 'none';
+    document.getElementById('startMenu').style.display = 'none';
+    document.getElementById('startMenuBackground').style.display = 'none';
+    document.getElementById('gameOverBackground').style.display = 'none';
+
+   
+    restartButton.style.display = 'none';
+    document.getElementById('scores').style.display = 'none';
+
+    // Reset game variables
+    resetScore();
+    // Update UI for score
+    document.getElementById('score').innerHTML = `Score: ${score}`;
+ 
+}
 

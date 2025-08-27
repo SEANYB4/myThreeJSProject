@@ -120,6 +120,25 @@
 }
 
 
+#restartButton {
+    position: absolute;
+    top: 70%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    padding: 20px;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px solid #fff;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    display: none;
+    border-radius: 10px;
+
+}
+
+
 #backButton {
 
     position: absolute;
@@ -248,18 +267,25 @@ body, html {
     text-align: center;
 }
 
+
+#shieldIndicator {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    top: 20px;
+    left: 20%;
+}
+
+
+
 @media (max-width: 768px) {
 
     #touch-controls div {
         display: block;
     }
 
-    #bossHealthContainer, #playerHealthContainer {
-        width: 90%; /* Full width on smaller screens */
-        left: 50%;
-        transform: translateX(-50%);
-        top: 10px; /* More top space */
-    }
+   
 
     #startMenu, #controls, #controlsMenu, #backButton {
         width: 80%; /* Smaller width to fit mobile screens */
@@ -281,6 +307,6 @@ body, html {
   
 
     * {
-        font-size: 16px; /* Reduce font size for all elements */
+        font-size: 10px; /* Reduce font size for all elements */
     }
 }
