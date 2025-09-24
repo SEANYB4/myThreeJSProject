@@ -52,8 +52,8 @@ backButton.addEventListener('click', () => {
 
 // DATABASE SETUP
 
-const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
-const supabaseKey = process.env.REACT_APP_SUPABASE_KEY;
+const supabaseUrl = 'https://drbpkekgxqxonjomngcz.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRyYnBrZWtneHF4b25qb21uZ2N6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5MTE1MTQsImV4cCI6MjA2OTQ4NzUxNH0.O1XLfHnVLtP1Y_osLywGcJwgRfcql9s3vfqU5lHMwSs';
 
 // Create a single supabase client for interacting with your database
 const Supabase = supabase.createClient(supabaseUrl, supabaseKey);
